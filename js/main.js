@@ -1,45 +1,71 @@
 // ==========================================
-// Simulador: Control de Acceso con Intentos
-// Pre-Entrega 2: Control de Ciclos y Flujo
+// Simulador: Reserva de Entradas de Cine
 // ==========================================
 
-// 1. Constantes y variables de estado
-const CLAVE_CORRECTA = "coder";
-const MAX_INTENTOS = 4;
+const BASE_PRICE = 15;
+let continuar = true;
 
-let intentos = 0;
-let accesoConcedido = false;
+while (continuar) {
+  // 1. Entrada de datos interactiva
+  let entradaEdad = prompt("🎟️ Ingresá tu edad (o escribí 'ESC' para salir):");
 
-// 2. Ciclo principal: se repite mientras queden intentos y no se haya acertado
-while (intentos < MAX_INTENTOS && !accesoConcedido) {
-  const ingreso = prompt(
-    `🔐 Ingresá tu clave de acceso (Intento ${intentos + 1} de ${MAX_INTENTOS}):`
+  // Condición de parada (stop)
+  if (entradaEdad === null || entradaEdad.toUpperCase() === "ESC") {
+    continuar = false;
+    alert("Gracias por visitar nuestro sistema de reservas.");
+    break;
+  }
+
+  let age = Number(entradaEdad);
+
+  // Validación de número válido
+  if (isNaN(age) || age < 1) {
+    alert("❌ Por favor, ingresá una edad válida.");
+    continue;
+  }
+
+  // Comprobación de edad mínima
+  if (age < 18) {
+    alert("⛔ Lo sentimos, tenés que ser mayor de 18 años para reservar entradas.");
+    continue;
+  }
+
+  // 2. Selección de función y tipo de asiento
+  let showTime = prompt("Seleccioná el horario:\n1 - Tarde (Afternoon)\n2 - Noche (Evening)");
+  let seatType = prompt("Seleccioná la categoría del asiento:\n1 - Standard\n2 - Gold\n3 - Premium");
+  let isMember = confirm("¿Tenés membresía del cine? (Aceptar = Sí / Cancelar = No)");
+
+  // 3. Cálculo de Descuento
+  let discount = 0;
+  if (isMember && age >= 21) {
+    discount = 3;
+    alert("✨ ¡Calificás para un descuento de socio de $3!");
+  }
+
+  // 4. Cargos adicionales por horario nocturno
+  let extraCharges = 0;
+  if (showTime === "2" || showTime?.toLowerCase() === "evening") {
+    extraCharges = 2;
+  }
+
+  // 5. Cargo por tipo de asiento
+  let serviceCharges = 1; // Standard por defecto
+  if (seatType === "3" || seatType?.toLowerCase() === "premium") {
+    serviceCharges = 5;
+  } else if (seatType === "2" || seatType?.toLowerCase() === "gold") {
+    serviceCharges = 3;
+  }
+
+  // 6. Cálculo y resultado final
+  const totalPrice = BASE_PRICE - discount + extraCharges + serviceCharges;
+
+  alert(
+    `📋 Resumen de tu reserva:\n` +
+    `• Precio Base: $${BASE_PRICE}\n` +
+    `• Descuento: -$${discount}\n` +
+    `• Cargo por horario: +$${extraCharges}\n` +
+    `• Cargo por asiento: +$${serviceCharges}\n` +
+    `---------------------------\n` +
+    `💵 Total a pagar: $${totalPrice}`
   );
-
-  // Validación de cancelación (si el usuario presiona Cancelar o Esc)
-  if (ingreso === null) {
-    alert("Operación cancelada por el usuario.");
-    break; // Condición de parada manual
-  }
-
-  // Evaluación de la clave
-  if (ingreso === CLAVE_CORRECTA) {
-    accesoConcedido = true;
-    alert("✅ ¡Acceso concedido! Bienvenido al sistema.");
-    console.log("Estado: Autenticado exitosamente.");
-  } else {
-    intentos++;
-    const restantes = MAX_INTENTOS - intentos;
-
-    if (restantes > 0) {
-      alert(`❌ Clave incorrecta. Te quedan ${restantes} intento(s).`);
-      console.warn(`Intento fallido. Restantes: ${restantes}`);
-    }
-  }
-}
-
-// 3. Resultado final tras salir del bucle
-if (!accesoConcedido && intentos === MAX_INTENTOS) {
-  alert("🔒 Cuenta bloqueada: superaste el número máximo de intentos.");
-  console.error("Estado: Bloqueado por seguridad.");
 }
